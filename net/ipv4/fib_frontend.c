@@ -801,6 +801,9 @@ static void fib_del_ifaddr(struct in_ifaddr *ifa)
 		}
 	}
 
+	if (in_dev->dead)
+		goto no_promotions;
+
 	/* Deletion is more complicated than add.
 	 * We should take care of not to delete too much :-)
 	 *
@@ -818,6 +821,7 @@ static void fib_del_ifaddr(struct in_ifaddr *ifa)
 			ok |= BRD0_OK;
 	}
 
+no_promotions:
 	if (!(ok & BRD_OK))
 		fib_magic(RTM_DELROUTE, RTN_BROADCAST, ifa->ifa_broadcast, 32, prim);
 	if (!(ok & BRD1_OK))
