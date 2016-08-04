@@ -336,7 +336,7 @@ static void inquiry_cache_flush(struct hci_dev *hdev)
 	struct inquiry_cache *cache = &hdev->inq_cache;
 	struct inquiry_entry *next  = cache->list, *e;
 
-	BT_DBG("cache %p", cache);
+	BT_DBG("cache %pK", cache);
 
 	cache->list = NULL;
 	while ((e = next)) {
@@ -350,7 +350,7 @@ struct inquiry_entry *hci_inquiry_cache_lookup(struct hci_dev *hdev, bdaddr_t *b
 	struct inquiry_cache *cache = &hdev->inq_cache;
 	struct inquiry_entry *e;
 
-	BT_DBG("cache %p, %s", cache, batostr(bdaddr));
+	BT_DBG("cache %pK, %s", cache, batostr(bdaddr));
 
 	for (e = cache->list; e; e = e->next)
 		if (!bacmp(&e->data.bdaddr, bdaddr))
@@ -363,7 +363,7 @@ void hci_inquiry_cache_update(struct hci_dev *hdev, struct inquiry_data *data)
 	struct inquiry_cache *cache = &hdev->inq_cache;
 	struct inquiry_entry *ie;
 
-	BT_DBG("cache %p, %s", cache, batostr(&data->bdaddr));
+	BT_DBG("cache %pK, %s", cache, batostr(&data->bdaddr));
 
 	ie = hci_inquiry_cache_lookup(hdev, &data->bdaddr);
 	if (!ie) {
@@ -399,7 +399,7 @@ static int inquiry_cache_dump(struct hci_dev *hdev, int num, __u8 *buf)
 		info++;
 	}
 
-	BT_DBG("cache %p, copied %d", cache, copied);
+	BT_DBG("cache %pK, copied %d", cache, copied);
 	return copied;
 }
 
@@ -495,7 +495,7 @@ int hci_dev_open(__u16 dev)
 	if (!(hdev = hci_dev_get(dev)))
 		return -ENODEV;
 
-	BT_DBG("%s %p", hdev->name, hdev);
+	BT_DBG("%s %pK", hdev->name, hdev);
 
 	hci_req_lock(hdev);
 
@@ -565,7 +565,7 @@ done:
 
 static int hci_dev_do_close(struct hci_dev *hdev)
 {
-	BT_DBG("%s %p", hdev->name, hdev);
+	BT_DBG("%s %pK", hdev->name, hdev);
 
 	hci_req_cancel(hdev, ENODEV);
 	hci_req_lock(hdev);
@@ -855,7 +855,7 @@ static int hci_rfkill_set_block(void *data, bool blocked)
 {
 	struct hci_dev *hdev = data;
 
-	BT_DBG("%p name %s blocked %d", hdev, hdev->name, blocked);
+	BT_DBG("%pK name %s blocked %d", hdev, hdev->name, blocked);
 
 	if (!blocked)
 		return 0;
@@ -900,7 +900,7 @@ int hci_register_dev(struct hci_dev *hdev)
 	struct list_head *head = &hci_dev_list, *p;
 	int i, id = 0;
 
-	BT_DBG("%p name %s bus %d owner %p", hdev, hdev->name,
+	BT_DBG("%pK name %s bus %d owner %pK", hdev, hdev->name,
 						hdev->bus, hdev->owner);
 
 	if (!hdev->open || !hdev->close || !hdev->destruct)
@@ -991,7 +991,7 @@ int hci_unregister_dev(struct hci_dev *hdev)
 {
 	int i;
 
-	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
+	BT_DBG("%pK name %s bus %d", hdev, hdev->name, hdev->bus);
 
 	write_lock_bh(&hci_dev_list_lock);
 	list_del(&hdev->list);
@@ -1237,7 +1237,7 @@ int hci_register_proto(struct hci_proto *hp)
 {
 	int err = 0;
 
-	BT_DBG("%p name %s id %d", hp, hp->name, hp->id);
+	BT_DBG("%pK name %s id %d", hp, hp->name, hp->id);
 
 	if (hp->id >= HCI_MAX_PROTO)
 		return -EINVAL;
@@ -1259,7 +1259,7 @@ int hci_unregister_proto(struct hci_proto *hp)
 {
 	int err = 0;
 
-	BT_DBG("%p name %s id %d", hp, hp->name, hp->id);
+	BT_DBG("%pK name %s id %d", hp, hp->name, hp->id);
 
 	if (hp->id >= HCI_MAX_PROTO)
 		return -EINVAL;
@@ -1279,7 +1279,7 @@ EXPORT_SYMBOL(hci_unregister_proto);
 
 int hci_register_cb(struct hci_cb *cb)
 {
-	BT_DBG("%p name %s", cb, cb->name);
+	BT_DBG("%pK name %s", cb, cb->name);
 
 	write_lock_bh(&hci_cb_list_lock);
 	list_add(&cb->list, &hci_cb_list);
@@ -1291,7 +1291,7 @@ EXPORT_SYMBOL(hci_register_cb);
 
 int hci_unregister_cb(struct hci_cb *cb)
 {
-	BT_DBG("%p name %s", cb, cb->name);
+	BT_DBG("%pK name %s", cb, cb->name);
 
 	write_lock_bh(&hci_cb_list_lock);
 	list_del(&cb->list);
@@ -1394,7 +1394,7 @@ void hci_send_acl(struct hci_conn *conn, struct sk_buff *skb, __u16 flags)
 	struct hci_dev *hdev = conn->hdev;
 	struct sk_buff *list;
 
-	BT_DBG("%s conn %p flags 0x%x", hdev->name, conn, flags);
+	BT_DBG("%s conn %pK flags 0x%x", hdev->name, conn, flags);
 
 	skb->dev = (void *) hdev;
 	bt_cb(skb)->pkt_type = HCI_ACLDATA_PKT;
@@ -1403,12 +1403,12 @@ void hci_send_acl(struct hci_conn *conn, struct sk_buff *skb, __u16 flags)
 	list = skb_shinfo(skb)->frag_list;
 	if (!list) {
 		/* Non fragmented */
-		BT_DBG("%s nonfrag skb %p len %d", hdev->name, skb, skb->len);
+		BT_DBG("%s nonfrag skb %pK len %d", hdev->name, skb, skb->len);
 
 		skb_queue_tail(&conn->data_q, skb);
 	} else {
 		/* Fragmented */
-		BT_DBG("%s frag %p len %d", hdev->name, skb, skb->len);
+		BT_DBG("%s frag %pK len %d", hdev->name, skb, skb->len);
 
 		skb_shinfo(skb)->frag_list = NULL;
 
@@ -1425,7 +1425,7 @@ void hci_send_acl(struct hci_conn *conn, struct sk_buff *skb, __u16 flags)
 			bt_cb(skb)->pkt_type = HCI_ACLDATA_PKT;
 			hci_add_acl_hdr(skb, conn->handle, flags);
 
-			BT_DBG("%s frag %p len %d", hdev->name, skb, skb->len);
+			BT_DBG("%s frag %pK len %d", hdev->name, skb, skb->len);
 
 			__skb_queue_tail(&conn->data_q, skb);
 		} while (list);
@@ -1497,7 +1497,7 @@ static inline struct hci_conn *hci_low_sent(struct hci_dev *hdev, __u8 type, int
 	} else
 		*quote = 0;
 
-	BT_DBG("conn %p quote %d", conn, *quote);
+	BT_DBG("conn %pK quote %d", conn, *quote);
 	return conn;
 }
 
@@ -1537,7 +1537,7 @@ static inline void hci_sched_acl(struct hci_dev *hdev)
 
 	while (hdev->acl_cnt && (conn = hci_low_sent(hdev, ACL_LINK, &quote))) {
 		while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
-			BT_DBG("skb %p len %d", skb, skb->len);
+			BT_DBG("skb %pK len %d", skb, skb->len);
 
 			hci_conn_enter_active_mode(conn, bt_cb(skb)->force_active);
 
@@ -1561,7 +1561,7 @@ static inline void hci_sched_sco(struct hci_dev *hdev)
 
 	while (hdev->sco_cnt && (conn = hci_low_sent(hdev, SCO_LINK, &quote))) {
 		while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
-			BT_DBG("skb %p len %d", skb, skb->len);
+			BT_DBG("skb %pK len %d", skb, skb->len);
 			hci_send_frame(skb);
 
 			conn->sent++;
@@ -1581,7 +1581,7 @@ static inline void hci_sched_esco(struct hci_dev *hdev)
 
 	while (hdev->sco_cnt && (conn = hci_low_sent(hdev, ESCO_LINK, &quote))) {
 		while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
-			BT_DBG("skb %p len %d", skb, skb->len);
+			BT_DBG("skb %pK len %d", skb, skb->len);
 			hci_send_frame(skb);
 
 			conn->sent++;

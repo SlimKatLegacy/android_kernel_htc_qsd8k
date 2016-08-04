@@ -38,7 +38,7 @@ static int cmd_status(struct sock *sk, u16 cmd, u8 status)
 	struct mgmt_hdr *hdr;
 	struct mgmt_ev_cmd_status *ev;
 
-	BT_DBG("sock %p", sk);
+	BT_DBG("sock %pK", sk);
 
 	skb = alloc_skb(sizeof(*hdr) + sizeof(*ev), GFP_ATOMIC);
 	if (!skb)
@@ -66,7 +66,7 @@ static int read_version(struct sock *sk)
 	struct mgmt_ev_cmd_complete *ev;
 	struct mgmt_rp_read_version *rp;
 
-	BT_DBG("sock %p", sk);
+	BT_DBG("sock %pK", sk);
 
 	skb = alloc_skb(sizeof(*hdr) + sizeof(*ev) + sizeof(*rp), GFP_ATOMIC);
 	if (!skb)
@@ -100,7 +100,7 @@ static int read_index_list(struct sock *sk)
 	u16 count;
 	int i;
 
-	BT_DBG("sock %p", sk);
+	BT_DBG("sock %pK", sk);
 
 	read_lock(&hci_dev_list_lock);
 
@@ -149,7 +149,7 @@ static int read_controller_info(struct sock *sk, unsigned char *data, u16 len)
 	struct hci_dev *hdev;
 	u16 dev_id;
 
-	BT_DBG("sock %p", sk);
+	BT_DBG("sock %pK", sk);
 
 	if (len != 2)
 		return cmd_status(sk, MGMT_OP_READ_INFO, EINVAL);
